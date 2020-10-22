@@ -15,6 +15,7 @@ C:\path\InternationalFinanceApp>venv\Scripts\activate.bat
 ```
 
 ## Structure
+![IFAStructure](https://github.com/matthewmyrick/InternationalFinanceApp/blob/main/images/IFAStructure.png)
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
