@@ -2,12 +2,53 @@ import math
 from tkinter import messagebox
 
 class Computation():
+    def interestRateParity(
+            self, spot, forward, interestDomestic, interestForeign,
+            borrowedDomestic, borrowedForeign, domesticType, foreignType
+    ):
+        '''
+        This function calculates the Interest Rate Parity
+        '''
+        try:
+            # Calculate the right side of the equation
+            rightSide = float(spot*((1+interestDomestic)/(1+interestForeign)))
+            if rightSide == forward:
+                arbitrage = "There is no arbitrage."
+                return arbitrage
+            elif rightSide < forward:
+                arbitrage = \
+                    "IRP is not holding, implying that a profitable arbitrage opportunity exists." \
+                    "Arbitrage transaction should involve borrowing in the " + domesticType + " and lending in the " + foreignType + "."
+                if borrowedDomestic > 0 and borrowedForeign > 0:
+                    # calculate the profits from each country and compare
+                    domesticProfit = borrowedDomestic * (1+interestDomestic)
+                    foreignProfit = (borrowedForeign * (1+interestForeign)) * forward
+                    profit = foreignProfit - domesticProfit
+                    arbitrageProfit =  "The arbitrager still has " + str(round(profit, 2)) + " " + domesticType + \
+                                       " left in the account, which is arbitrage's profit"
+                    return arbitrage, arbitrageProfit
+                return arbitrage, 0
+            elif rightSide > forward:
+                arbitrage = "IRP is not holding, implying that a profitable arbitrage opportunity exists." \
+                            "Arbitrage transaction should involve borrowing in the " + foreignType + " and lending in the " + domesticType + "."
+                if borrowedDomestic > 0 and borrowedForeign > 0:
+                    # calculate the profits from each country and compare
+                    domesticProfit = borrowedDomestic * (1 + interestDomestic)
+                    foreignProfit = (borrowedForeign * (1 + interestForeign)) * forward
+                    profit = domesticProfit - foreignProfit
+                    arbitrageProfit = "The arbitrager still has " + str(round(profit, 2)) + " " + domesticType + \
+                                      " left in the account, which is arbitrage's profit"
+                    return arbitrage, arbitrageProfit
+                return arbitrage, 0
+        except:
+            messagebox.showerror("Error", "Unknown Error. Please make sure values are inputted correctly")
+
     def currencyConversion(
             self, conversionCurrency, conversionCurrencyType,
             baseCurrencyType, inputCurency, inputCurencyType
     ):
         '''
-        TThis function calculates the conversion of currencies
+        This function calculates the conversion of currencies
         '''
         try:
             # Error Message Box Exception
@@ -123,3 +164,74 @@ class Computation():
         except:
             messagebox.showerror("Error", "Make Sure All input values are correct")
             return None
+
+    def triangularArbitrage(
+            self,
+            rateA, rateATypeOne, rateATypeTwo,
+            rateB, rateBTypeOne, rateBTypeTwo,
+            rateC, rateCTypeOne, rateCTypeTwo,
+            amount, amountType
+    ):
+        '''
+        This function calculates the triangular arbitrage profit
+        '''
+        # calculate arbitrage
+        impliedCrossRate = rateA * rateB
+        # get the round amount from cross exchange parameter
+        rateCRoundIndex = len(str(float(rateC)).split('.')[1])
+
+        # condition handle to for implied cross rate and cross rate
+        if round(impliedCrossRate, rateCRoundIndex) == rateC:
+            arbitrage = "There is not arbitrage opportunity."
+            return arbitrage
+        # condition for implied cross rate > actual cross rate
+        elif round(impliedCrossRate, rateCRoundIndex) != rateC:
+            # establish variables
+            amount = amount
+            amountType = amountType
+            arbitrageProfit = 0
+            # check arbitrage type for UI
+            arbitrageText = ""
+            if round(impliedCrossRate, rateCRoundIndex) > rateC:
+                arbitrageText = str(round(impliedCrossRate, rateCRoundIndex))+" > "+str(rateC)+" Implying Arbitrage Opportunity."
+            elif round(impliedCrossRate, rateCRoundIndex) < rateC:
+                arbitrageText = str(round(impliedCrossRate, rateCRoundIndex))+" < "+str(rateC)+" Implying Arbitrage Opportunity."
+
+            # exchange A conditions
+            if rateATypeOne == amountType and rateATypeTwo != amountType:
+                arbitrageProfit = amount / rateA
+                amountType = rateATypeTwo
+            elif rateATypeOne != amountType and rateATypeTwo == amountType:
+                arbitrageProfit = amount * rateA
+                amountType = rateATypeOne
+            else:
+                messagebox.showerror("Error", "Please check Exchange A Types.")
+                return None
+
+            # exchange C conditions
+            if rateCTypeOne == amountType and rateCTypeTwo != amountType:
+                arbitrageProfit = arbitrageProfit / rateC
+                amountType = rateCTypeTwo
+            elif rateCTypeOne != amountType and rateCTypeTwo == amountType:
+                arbitrageProfit = arbitrageProfit * rateC
+                amountType = rateCTypeOne
+            else:
+                messagebox.showerror("Error", "Please check Exchange C Types.")
+                return None
+
+            # exchange B conditions
+            if rateBTypeOne == amountType and rateBTypeTwo != amountType:
+                arbitrageProfit = arbitrageProfit / rateB
+                amountType = rateBTypeTwo
+                # get actual profit
+                arbitrageProfit = arbitrageProfit - amount
+                return arbitrageText, round(abs(arbitrageProfit), 2), amountType
+            elif rateBTypeOne != amountType and rateBTypeTwo == amountType:
+                arbitrageProfit = arbitrageProfit * rateB
+                amountType = rateBTypeOne
+                # get actual profit
+                arbitrageProfit = arbitrageProfit - amount
+                return arbitrageText, round(abs(arbitrageProfit), 2), amountType
+            else:
+                messagebox.showerror("Error", "Please check Exchange B Types.")
+                return None

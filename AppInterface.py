@@ -20,6 +20,7 @@ class MainApplication(tk.Frame):
         arguments:
             master
         '''
+
         # Get Currency Data
         self.rawCurreniesCountries = DataManagment().currencyData()
         self.countries = self.rawCurreniesCountries[0]
@@ -33,10 +34,13 @@ class MainApplication(tk.Frame):
         self.master = master
 
         # Create Size of Screen
-        self.master.geometry("900x600")
+        self.master.geometry("1200x850")
 
         # Label Title
-        master.title("International Finance Application")
+        self.master.title("International Finance Application")
+
+        # Create Icon
+        self.master.iconbitmap('./icon/InternationalFinanceIcon.ico')
 
         # Tab Control
         self.TabControl = ttk.Notebook(self.master)
@@ -49,17 +53,15 @@ class MainApplication(tk.Frame):
         self.SimpleCrossCurrencyTab()
         # Call Complex Cross Currency Tab Function
         self.ComplexCrossCurrencyTab()
+        # Interest Rate Parity Tab
+        self.InterestRateParity()
         # Call Triangular Arbitrage Tab Function
         self.TriangularArbitrageTab()
         # Call Forwards Tab Function
         self.ForwardsTab()
-        # Call Forwards Pnl Tab Function
-        self.ForwardsPnlTab()
 
         # Pack all tabs into Window
         self.TabControl.pack(expand=1, fill="both")
-
-
 
     '''
     ###################################################
@@ -119,7 +121,7 @@ class MainApplication(tk.Frame):
         conversionLable = Label(
             CurrencyConversionTab,
             text="0.00",
-            font=("Times New Roman bold", 11),
+            font=("Times New Roman ", 10),
             textvariable=conversionStringVar
         ).grid(row=5, column=0)
         perStringVar = StringVar()
@@ -133,7 +135,7 @@ class MainApplication(tk.Frame):
         inputLabel = Label(
             CurrencyConversionTab,
             text="0.00",
-            font=("Times New Roman bold", 11),
+            font=("Times New Roman", 10),
             textvariable=inputStringVar
         ).grid(row=7, column=0)
 
@@ -155,7 +157,7 @@ class MainApplication(tk.Frame):
             CurrencyConversionTab, text="Convert",
             command=lambda: conversionCall()
         ).grid(
-            row=3, column=1, pady=20
+            row=3, column=2, pady=20
         )
 
         # Conversion Call function
@@ -655,6 +657,151 @@ class MainApplication(tk.Frame):
 
     '''
     ###################################################
+    INTEREST RATE PARITY TAB
+    ###################################################
+    '''
+    def InterestRateParity(self):
+        '''
+        This function creates the UI & UX of the Interest Rate Parity Tab
+        '''
+        # Create Currency Conversion Tab
+        InterestRateParityTab = ttk.Frame(
+            self.TabControl,
+            width=100, height=100
+        )
+        self.TabControl.add(
+            InterestRateParityTab, text="Interest Rate Parity"
+        )
+
+        # Create Comboboxes
+        conversionCurrencyType = Widgets().ComboBox(
+            tab=InterestRateParityTab, data=self.currenciesCountries,
+            default="USD (United States dollar)",
+            rows=1, columns=1, padx=10, pady=10
+        )
+        baseCurrencyType = Widgets().ComboBox(
+            tab=InterestRateParityTab, data=self.currenciesCountries,
+            default="EUR (Euro)",
+            rows=1, columns=2, padx=10, pady=10
+        )
+
+        # Create labels
+        ttk.Label(InterestRateParityTab,
+                text="Select & Input Conversion Currency",
+                font=("Times New Roman", 10)).grid(
+            column=1, row=0, padx=10, pady=5)
+        ttk.Label(InterestRateParityTab,
+                text="Select Base Currency",
+                font=("Times New Roman", 10)).grid(
+            column=2, row=0, padx=10, pady=5)
+        ttk.Label(InterestRateParityTab,
+                text="Spot Exchange",
+                font=("Times New Roman", 10)).grid(
+            column=0, row=2, padx=10, pady=5)
+        ttk.Label(InterestRateParityTab,
+                text="Forward Exchange",
+                font=("Times New Roman", 10)).grid(
+            column=0, row=3, padx=10, pady=5)
+        ttk.Label(InterestRateParityTab,
+                text="Interest Rate (decimal)",
+                font=("Times New Roman", 10)).grid(
+            column=0, row=4, padx=10, pady=5)
+        ttk.Label(InterestRateParityTab,
+                  text="Borrowed Amount",
+                  font=("Times New Roman", 10)).grid(
+            column=0, row=5, padx=10, pady=5)
+
+        # Create Entry Widgets
+        spotOneEntry = Widgets().Entry(
+            tab=InterestRateParityTab, default="0.00", state="normal",
+            row=2, column=1, padx=0, pady=0)
+        spotTwoEntry = Widgets().Entry(
+            tab=InterestRateParityTab, default="1.00", state="readonly",
+            row=2, column=2, padx=0, pady=0
+        )
+        forwardOneEntry = Widgets().Entry(
+            tab=InterestRateParityTab, default="0.00", state="normal",
+            row=3, column=1, padx=0, pady=0)
+        forwardTwoEntry = Widgets().Entry(
+            tab=InterestRateParityTab, default="1.00", state="readonly",
+            row=3, column=2, padx=0, pady=0
+        )
+        interestOneEntry = Widgets().Entry(
+            tab=InterestRateParityTab, default="0.00", state="normal",
+            row=4, column=1, padx=0, pady=0)
+        interestTwoEntry = Widgets().Entry(
+            tab=InterestRateParityTab, default="0.00", state="normal",
+            row=4, column=2, padx=0, pady=0
+        )
+        borrowedOneEntry = Widgets().Entry(
+            tab=InterestRateParityTab, default="0.00", state="normal",
+            row=5, column=1, padx=0, pady=0)
+        borrowedTwoEntry = Widgets().Entry(
+            tab=InterestRateParityTab, default="0.00", state="normal",
+            row=5, column=2, padx=0, pady=0
+        )
+
+        # Compute Button
+        computeButton = Button(
+            InterestRateParityTab, text="Compute",
+            command=lambda: computeCall()
+        ).grid(
+            row=6, column=2, pady=20
+        )
+
+        # Conversion Label
+        ttk.Label(InterestRateParityTab,
+                  text="Computation\t\t",
+                  font=("Times New Roman bold", 10)).grid(
+            column=0, row=7, padx=10, pady=5)
+
+        # Updated Label Widgets
+        arbitrageStringVar = StringVar()
+        Label(
+            InterestRateParityTab,
+            text="0.00",
+            font=("Times New Roman ", 10),
+            textvariable=arbitrageStringVar,
+            wraplength=400
+        ).grid(row=8, column=0)
+        arbitrageProfitStringVar = StringVar()
+        Label(
+            InterestRateParityTab,
+            text="0.00",
+            font=("Times New Roman ", 10),
+            textvariable=arbitrageProfitStringVar,
+            wraplength=400
+        ).grid(row=9, column=0)
+
+
+        def computeCall():
+            '''
+            This nested function calls the computation
+            class to solve the IRP,
+            then update the program window
+            '''
+            try:
+                # Call Computation Class to Convert currency
+                conversion = Computation().interestRateParity(
+                    spot=float(spotOneEntry.get()), forward=float(forwardOneEntry.get()),
+                    interestDomestic=float(interestOneEntry.get()), interestForeign=float(interestTwoEntry.get()),
+                    borrowedDomestic=float(borrowedOneEntry.get()), borrowedForeign=float(borrowedTwoEntry.get()),
+                    domesticType=conversionCurrencyType.get(), foreignType=baseCurrencyType.get()
+                )
+                print(conversion)
+                # Update tkinter Window
+                arbitrageStringVar.set(
+                    conversion[0]
+                )
+                arbitrageProfitStringVar.set(
+                    conversion[1]
+                )
+            except:
+                messagebox.showerror("Error", "Unexpected Error has occurred please try again.")
+                return None
+
+    '''
+    ###################################################
     TRIANGULAR ARBITRAGE TAB
     ###################################################
     '''
@@ -665,6 +812,168 @@ class MainApplication(tk.Frame):
         # Create Cross Currency Tab
         TriangularArbitrageTab = ttk.Frame(self.TabControl)
         self.TabControl.add(TriangularArbitrageTab, text="Triangular Arbitrage")
+
+        # column headers
+        ttk.Label(TriangularArbitrageTab,
+                  text="C1",
+                  font=("Times New Roman", 10)).grid(
+            column=1, row=0, padx=55, pady=15)
+        ttk.Label(TriangularArbitrageTab,
+                  text="C2",
+                  font=("Times New Roman", 10)).grid(
+            column=3, row=0, padx=55, pady=15)
+
+        # Exchange A
+        ttk.Label(TriangularArbitrageTab,
+                  text="Exchange A",
+                  font=("Times New Roman bold", 10)).grid(
+            column=0, row=1, padx=55, pady=15, sticky='e')
+        ttk.Label(TriangularArbitrageTab,
+                  text="Rates",
+                  font=("Times New Roman", 10)).grid(
+            column=0, row=2, padx=55, pady=15, sticky='e')
+        exchangeATypeOne = Widgets().ComboBox(
+            tab=TriangularArbitrageTab, data=self.currenciesCountries,
+            default="USD (United States dollar)",
+            rows=1, columns=1, padx=10, pady=10
+        )
+        ttk.Label(TriangularArbitrageTab,
+                  text="/",
+                  font=("Times New Roman", 10)).grid(
+            column=2, row=1, padx=20, pady=15)
+        exchangeATypeTwo = Widgets().ComboBox(
+            tab=TriangularArbitrageTab, data=self.currenciesCountries,
+            default="GBP (British pound)",
+            rows=1, columns=3, padx=10, pady=10
+        )
+        rateAEntryOne = Widgets().Entry(
+            tab=TriangularArbitrageTab, default="0.00",
+            state="normal", row=2, column=1, padx=20, pady=0)
+        rateAEntryTwo = Widgets().Entry(
+            tab=TriangularArbitrageTab, default="1.00",
+            state="readonly", row=2, column=3, padx=20, pady=0)
+
+
+        # Exchange B
+        ttk.Label(TriangularArbitrageTab,
+                  text="Exchange B",
+                  font=("Times New Roman bold", 10)).grid(
+            column=0, row=3, padx=55, pady=15, sticky='e')
+        ttk.Label(TriangularArbitrageTab,
+                  text="Rates",
+                  font=("Times New Roman", 10)).grid(
+            column=0, row=4, padx=55, pady=15, sticky='e')
+        exchangeBTypeOne = Widgets().ComboBox(
+            tab=TriangularArbitrageTab, data=self.currenciesCountries,
+            default="EUR (Euro)",
+            rows=3, columns=1, padx=10, pady=10
+        )
+        ttk.Label(TriangularArbitrageTab,
+                  text="/",
+                  font=("Times New Roman", 10)).grid(
+            column=2, row=3, padx=20, pady=15)
+        exchangeBTypeTwo = Widgets().ComboBox(
+            tab=TriangularArbitrageTab, data=self.currenciesCountries,
+            default="USD (United States dollar)",
+            rows=3, columns=3, padx=10, pady=10
+        )
+        rateBEntryOne = Widgets().Entry(
+            tab=TriangularArbitrageTab, default="0.00",
+            state="normal", row=4, column=1, padx=20, pady=0)
+        rateBEntryTwo = Widgets().Entry(
+            tab=TriangularArbitrageTab, default="1.00",
+            state="readonly", row=4, column=3, padx=20, pady=0)
+
+        # Exchange C
+        ttk.Label(TriangularArbitrageTab,
+                  text="Exchange C",
+                  font=("Times New Roman bold", 10)).grid(
+            column=0, row=5, padx=55, pady=15, sticky='e')
+        ttk.Label(TriangularArbitrageTab,
+                  text="Actual Cross Rate",
+                  font=("Times New Roman", 10)).grid(
+            column=0, row=6, padx=55, pady=15, sticky='e')
+        exchangeCTypeOne = Widgets().ComboBox(
+            tab=TriangularArbitrageTab, data=self.currenciesCountries,
+            default="EUR (Euro)",
+            rows=5, columns=1, padx=10, pady=10
+        )
+        ttk.Label(TriangularArbitrageTab,
+                  text="/",
+                  font=("Times New Roman", 10)).grid(
+            column=2, row=5, padx=20, pady=15)
+        exchangeCTypeTwo = Widgets().ComboBox(
+            tab=TriangularArbitrageTab, data=self.currenciesCountries,
+            default="GBP (British pound)",
+            rows=5, columns=3, padx=10, pady=10
+        )
+        rateCEntryOne = Widgets().Entry(
+            tab=TriangularArbitrageTab, default="0.00",
+            state="normal", row=6, column=1, padx=20, pady=0)
+        rateCEntryTwo = Widgets().Entry(
+            tab=TriangularArbitrageTab, default="1.00",
+            state="readonly", row=6, column=3, padx=20, pady=0)
+
+        # Amount Type and Input
+        ttk.Label(TriangularArbitrageTab,
+                  text="Amount",
+                  font=("Times New Roman bold", 10)).grid(
+            column=0, row=7, padx=55, pady=15, sticky='e')
+        amountEntry = Widgets().Entry(
+            tab=TriangularArbitrageTab, default="0.00",
+            state="normal", row=7, column=1, padx=20, pady=0)
+        amountType = Widgets().ComboBox(
+            tab=TriangularArbitrageTab, data=self.currenciesCountries,
+            default="USD (United States dollar)",
+            rows=7, columns=3, padx=10, pady=10
+        )
+
+        # Computation Button & label
+        computationButton = Button(
+            TriangularArbitrageTab, text="Compute",
+            command=lambda: computeCall()
+        ).grid(
+            row=8, column=3, pady=0
+        )
+        ttk.Label(TriangularArbitrageTab,
+                  text="Conversion",
+                  font=("Times New Roman bold", 10)).grid(
+            column=0, row=9, padx=55, pady=15, sticky='w')
+
+        # Updated Widgets
+        arbitrageTextStringVar = StringVar()
+        ttk.Label(TriangularArbitrageTab,
+                  text="0.00",
+                  font=("Times New Roman", 10),
+                  textvariable=arbitrageTextStringVar,
+                  wraplength=350).grid(
+            column=0, row=10, padx=55, pady=5)
+        arbitrageProfitStringVar = StringVar()
+        ttk.Label(TriangularArbitrageTab,
+                  text="0.00",
+                  font=("Times New Roman", 10),
+                  textvariable=arbitrageProfitStringVar).grid(
+            column=0, row=11, padx=55, pady=5)
+
+        def computeCall():
+            '''
+            This nested function calls the computation
+            class to solve the Triangular arbitrage,
+            then update the program window
+            '''
+            try:
+                compute = Computation().triangularArbitrage(
+                    float(rateAEntryOne.get()), str(exchangeATypeOne.get()), str(exchangeATypeTwo.get()),
+                    float(rateBEntryOne.get()), str(exchangeBTypeOne.get()), str(exchangeBTypeTwo.get()),
+                    float(rateCEntryOne.get()), str(exchangeCTypeOne.get()), str(exchangeCTypeTwo.get()),
+                    float(amountEntry.get()), str(amountType.get())
+                )
+                # Update Widgets
+                arbitrageTextStringVar.set(compute[0])
+                arbitrageProfitStringVar.set(str(compute[1]) + " " + compute[2])
+            except:
+                messagebox.showerror("Error", "Unexpected Error has occurred please try again.")
+                return None
 
     '''
     ###################################################
@@ -761,28 +1070,20 @@ class MainApplication(tk.Frame):
             class to solve the Simple Cross Currency,
             then update the program window
             '''
-            # Call Forwards data
-            forwardsData = Computation().forwardsPremDis(
-                float(spotEntry.get()), float(forwardEntry.get()),
-                float(daysEntry.get()), str(termsType.get())
-            )
+            try:
+                # Call Forwards data
+                forwardsData = Computation().forwardsPremDis(
+                    float(spotEntry.get()), float(forwardEntry.get()),
+                    float(daysEntry.get()), str(termsType.get())
+                )
 
-            # Update Widgets Based on Computation
-            premDisStringVar.set(str(forwardsData[1]))
-            forwardResultStringVar.set(str(forwardsData[0]) + " %")
-            return
-    '''
-    ###################################################
-    FORWARDS TAB
-    ###################################################
-    '''
-    def ForwardsPnlTab(self):
-        '''
-        This function creates the UI & UX of the Complex Cross Currency Tab
-        '''
-        # Create Cross Currency Tab
-        ForwardsPnlTab = ttk.Frame(self.TabControl)
-        self.TabControl.add(ForwardsPnlTab, text="Forwards PNL")
+                # Update Widgets Based on Computation
+                premDisStringVar.set(str(forwardsData[1]))
+                forwardResultStringVar.set(str(forwardsData[0]) + " %")
+            except:
+                messagebox.showerror("Error", "Unexpected Error has occurred please try again.")
+                return None
+
 
 
 if __name__ == "__main__":
