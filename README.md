@@ -13,10 +13,6 @@ C:\path\InternationalFinanceApp>venv\Scripts\activate.bat
 
 (venv) C:\path\InternationalFinanceApp>python AppInterface.py
 ```
-macOS
-```
-$
-```
 
 ## Structure
 
